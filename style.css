@@ -1,72 +1,84 @@
+/* Importing the Satoshi Font */
 @import url('https://api.fontshare.com/v2/css?f[]=satoshi@700,500,400&display=swap');
 
 body {
     margin: 0;
     font-family: 'Satoshi', sans-serif;
-    background-color: #12121A; /* Very dark background */
+    background-color: #0A0E2E; /* Dark Blue/Purple Background */
     color: #FFFFFF;
-    overflow: hidden; /* Prevents scrollbars from appearing */
+    overflow: hidden; /* Critical for preventing scrollbars */
     display: flex;
     justify-content: center;
     align-items: center;
-    height: 100vh;
-}
-
-.scene {
-    position: relative;
-    width: 100%;
-    height: 100%;
+    min-height: 100vh;
 }
 
 .layer {
     position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    transition: transform 0.2s ease-out; /* Smooths the movement */
+    top: -5%;
+    left: -5%;
+    width: 110%;
+    height: 110%;
+    background-repeat: no-repeat;
+    /* This transition makes the mouse follow effect smooth */
+    transition: transform 0.1s ease-out;
 }
 
-/* Creating ethereal glows with radial gradients */
+/* --- The Magic: Creating Ethereal Glows with CSS --- */
+
+/* Farthest layer: A large, soft blue glow */
 .layer-1 {
-    background: radial-gradient(circle at 20% 25%, rgba(0, 111, 255, 0.1), transparent 30%);
-}
-.layer-2 {
-    background: radial-gradient(circle at 80% 30%, rgba(255, 0, 229, 0.08), transparent 40%);
-}
-.layer-3 {
-    background: radial-gradient(circle at 50% 80%, rgba(0, 111, 255, 0.12), transparent 35%);
-}
-.layer-4 {
-    /* You can add more layers with lines or other shapes here */
+    background-image: radial-gradient(circle at 20% 30%, rgba(0, 82, 255, 0.15), transparent 40%);
+    z-index: 1;
 }
 
+/* A magenta glow on the other side */
+.layer-2 {
+    background-image: radial-gradient(circle at 80% 70%, rgba(255, 0, 229, 0.1), transparent 35%);
+    z-index: 2;
+}
+
+/* A smaller, more focused blue glow */
+.layer-3 {
+    background-image: radial-gradient(circle at 75% 25%, rgba(0, 82, 255, 0.2), transparent 30%);
+    z-index: 3;
+}
+
+/* This layer could be for abstract lines or particles in the future */
+.layer-4 {
+    z-index: 4;
+}
+
+
+/* --- Foreground Content --- */
 
 .content {
-    position: absolute;
+    position: relative; /* Changed from absolute to relative to stack properly */
     text-align: center;
-    z-index: 10;
+    z-index: 5; /* Ensures content is always on top */
     display: flex;
     flex-direction: column;
     align-items: center;
+    padding: 2rem;
 }
 
 .logo {
-    width: 80px; /* Adjust size as needed */
-    margin-bottom: 2rem;
+    width: 70px;
+    margin-bottom: 24px;
 }
 
 h1 {
-    font-size: 3.5rem;
+    font-size: 3.2rem;
     font-weight: 700;
     margin: 0;
-    max-width: 800px;
+    max-width: 750px;
     line-height: 1.2;
+    text-shadow: 0 0 20px rgba(0, 0, 0, 0.5); /* Adds readability */
 }
 
 .cta-button {
-    margin-top: 2.5rem;
-    padding: 1rem 2.5rem;
+    margin-top: 40px;
+    padding: 16px 40px;
     font-size: 1.1rem;
     font-weight: 500;
     font-family: 'Satoshi', sans-serif;
@@ -79,6 +91,6 @@ h1 {
 }
 
 .cta-button:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 10px 20px rgba(0, 82, 255, 0.2);
+    transform: translateY(-4px);
+    box-shadow: 0 12px 24px rgba(0, 82, 255, 0.25);
 }
