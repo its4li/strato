@@ -1,0 +1,84 @@
+@import url('https://api.fontshare.com/v2/css?f[]=satoshi@700,500,400&display=swap');
+
+body {
+    margin: 0;
+    font-family: 'Satoshi', sans-serif;
+    background-color: #12121A; /* Very dark background */
+    color: #FFFFFF;
+    overflow: hidden; /* Prevents scrollbars from appearing */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+}
+
+.scene {
+    position: relative;
+    width: 100%;
+    height: 100%;
+}
+
+.layer {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    transition: transform 0.2s ease-out; /* Smooths the movement */
+}
+
+/* Creating ethereal glows with radial gradients */
+.layer-1 {
+    background: radial-gradient(circle at 20% 25%, rgba(0, 111, 255, 0.1), transparent 30%);
+}
+.layer-2 {
+    background: radial-gradient(circle at 80% 30%, rgba(255, 0, 229, 0.08), transparent 40%);
+}
+.layer-3 {
+    background: radial-gradient(circle at 50% 80%, rgba(0, 111, 255, 0.12), transparent 35%);
+}
+.layer-4 {
+    /* You can add more layers with lines or other shapes here */
+}
+
+
+.content {
+    position: absolute;
+    text-align: center;
+    z-index: 10;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.logo {
+    width: 80px; /* Adjust size as needed */
+    margin-bottom: 2rem;
+}
+
+h1 {
+    font-size: 3.5rem;
+    font-weight: 700;
+    margin: 0;
+    max-width: 800px;
+    line-height: 1.2;
+}
+
+.cta-button {
+    margin-top: 2.5rem;
+    padding: 1rem 2.5rem;
+    font-size: 1.1rem;
+    font-weight: 500;
+    font-family: 'Satoshi', sans-serif;
+    color: #FFFFFF;
+    background-color: #0052FF; /* Base Network Blue */
+    border: none;
+    border-radius: 50px;
+    cursor: pointer;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.cta-button:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 10px 20px rgba(0, 82, 255, 0.2);
+}
