@@ -1,9 +1,10 @@
 document.addEventListener('DOMContentLoaded', () => {
-    // --- Element Selections (Moved inside to ensure DOM is loaded) ---
+    // --- Element Selections (Guaranteed to exist now) ---
     const strategiesSection = document.querySelector('.strategies-section');
     const modal = document.getElementById('strategy-modal');
     const closeModalBtn = document.getElementById('close-modal-btn');
     const activateStrategyBtn = document.querySelector('.modal-action-btn');
+    const totalValueAmount = document.querySelector('.card-amount');
 
     // --- Contract & Config Information ---
     const factoryAddress = "0xc342129C33b1090091B21c022e59b071937D51Ae";
@@ -18,14 +19,15 @@ document.addEventListener('DOMContentLoaded', () => {
     // --- Main Functions ---
     const displayStrategies = (strategies) => {
         const emptyState = strategiesSection.querySelector('.empty-state');
-        const strategyGrid = strategiesSection.querySelector('.strategy-grid') || document.createElement('div');
-        
-        if (!strategyGrid.classList.contains('strategy-grid')) {
+        let strategyGrid = strategiesSection.querySelector('.strategy-grid');
+
+        if (!strategyGrid) {
+            strategyGrid = document.createElement('div');
             strategyGrid.className = 'strategy-grid';
             strategiesSection.appendChild(strategyGrid);
         }
         
-        strategyGrid.innerHTML = ''; // Clear only the grid
+        strategyGrid.innerHTML = ''; 
 
         if (!strategies || strategies.length === 0) {
             emptyState.style.display = 'block';
@@ -50,13 +52,13 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         }
     };
-
-    const fetchStrategies = async () => { /* ... (This function remains the same as the last version) ... */ };
-    const createProxyWallet = async () => { /* ... (This function remains the same as the last version) ... */ };
-    const handleActivateStrategy = async (event) => { /* ... (This function remains the same as the last version) ... */ };
+    
+    const fetchStrategies = async () => { /* ... (This function remains the same) ... */ };
+    const createProxyWallet = async () => { /* ... (This function remains the same) ... */ };
+    const handleActivateStrategy = async (event) => { /* ... (This function remains the same) ... */ };
 
     const checkUserProxyWallet = async () => {
-        const openModalBtn = strategiesSection.querySelector('.cta-button'); // Select the button inside strategies section
+        const openModalBtn = strategiesSection.querySelector('.cta-button');
         console.log("Checking for Strato Wallet...");
         userProxyAddress = await factoryContract.wallets(userAddress);
 
@@ -70,10 +72,7 @@ document.addEventListener('DOMContentLoaded', () => {
     };
     
     async function init() {
-        console.log("Initializing Dashboard...");
-        if (typeof window.ethereum === 'undefined') {
-            alert("MetaMask is not installed."); return;
-        }
+        if (typeof window.ethereum === 'undefined') { alert("MetaMask is not installed."); return; }
         try {
             provider = new ethers.providers.Web3Provider(window.ethereum);
             const network = await provider.getNetwork();
@@ -81,7 +80,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 document.body.innerHTML = `<h1 style="color:white; text-align:center; margin-top: 50px;">Please switch to Base Sepolia and refresh.</h1>`;
                 return;
             }
-            
             signer = provider.getSigner();
             userAddress = await signer.getAddress();
             if (!factoryAddress || factoryAddress === "YOUR_STRATO_FACTORY_CONTRACT_ADDRESS") throw new Error("Factory address is not set.");
@@ -92,9 +90,7 @@ document.addEventListener('DOMContentLoaded', () => {
             await fetchStrategies();
             
             closeModalBtn.addEventListener('click', () => modal.classList.add('hidden'));
-            modal.addEventListener('click', (event) => {
-                if (event.target === modal) modal.classList.add('hidden');
-            });
+            modal.addEventListener('click', (event) => { if (event.target === modal) modal.classList.add('hidden'); });
             activateStrategyBtn.addEventListener('click', handleActivateStrategy);
 
         } catch (error) {
@@ -102,6 +98,5 @@ document.addEventListener('DOMContentLoaded', () => {
             document.body.innerHTML = `<h1 style="color:red; text-align:center; margin-top: 50px;">Error: ${error.message}</h1>`;
         }
     }
-    
     init();
 });
