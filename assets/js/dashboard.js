@@ -16,53 +16,79 @@ document.addEventListener('DOMContentLoaded', () => {
     let provider, signer, factoryContract, userAddress, userProxyAddress;
 
     // --- Main Functions ---
-    const displayStrategies = (strategies) => { /* ... Function code ... */ };
-    const fetchStrategies = async () => { /* ... Function code ... */ };
-    
-    const checkUserProxyWallet = async () => {
-        const openModalBtn = strategiesSection.querySelector('.cta-button');
-        console.log("Checking for Strato Wallet...");
-        userProxyAddress = await factoryContract.wallets(userAddress);
+    const displayStrategies = (strategies) => {
+        const emptyStateHTML = `
+            <div class="empty-state">
+                <p>Your automated strategies will appear here.</p>
+                <button class="cta-button" id="open-modal-btn">+ Create New Strategy</button>
+            </div>`;
 
-        if (userProxyAddress && userProxyAddress !== ethers.constants.AddressZero) {
-            console.log("Strato Wallet found at:", userProxyAddress);
-            openModalBtn.textContent = "+ Create New Strategy";
-            openModalBtn.onclick = () => modal.classList.remove('hidden');
-        } else {
-            console.log("No Strato Wallet found for this user.");
-            openModalBtn.textContent = "Create Your Strato Wallet";
-            openModalBtn.onclick = createProxyWallet;
+        const strategyGridHTML = (strategies.map(strategy => `
+            <div class="card strategy-card">
+                <div class="strategy-card-header">
+                    <span class="strategy-type">${strategy.strategy_type.replace('_', ' ')}</span>
+                    <span class="status ${strategy.is_active ? 'active' : ''}">${strategy.is_active ? 'Active' : 'Paused'}</span>
+                </div>
+                <div class="strategy-card-body">Spending ${strategy.amount_in} USDC every week to buy WETH.</div>
+                <div class="strategy-card-footer">
+                    <button class="card-button">Details</button>
+                    <button class="card-button pause">Pause</button>
+                </div>
+            </div>`
+        ).join(''));
+
+        strategiesSection.innerHTML = `
+            <h2 class="section-title">Active Strategies</h2>
+            ${(!strategies || strategies.length === 0) ? emptyStateHTML : `<div class="strategy-grid">${strategyGridHTML}</div>`}
+        `;
+
+        // Re-bind the button after the HTML is updated
+        bindOpenModalButton();
+    };
+
+    const fetchStrategies = async () => { /* ... same as before ... */ };
+    
+    const bindOpenModalButton = () => {
+        const openModalBtn = document.getElementById('open-modal-btn');
+        if (openModalBtn) {
+            if (userProxyAddress && userProxyAddress !== ethers.constants.AddressZero) {
+                openModalBtn.textContent = "+ Create New Strategy";
+                openModalBtn.onclick = () => modal.classList.remove('hidden');
+            } else {
+                openModalBtn.textContent = "Create Your Strato Wallet";
+                openModalBtn.onclick = createProxyWallet;
+            }
         }
     };
     
-    // THIS FUNCTION WAS MISSING
-    const createProxyWallet = async () => {
-        const createBtn = strategiesSection.querySelector('.cta-button');
-        createBtn.textContent = "Creating... (Check Wallet)";
-        createBtn.disabled = true;
-        try {
-            const tx = await factoryContract.createProxyWallet();
-            console.log("Transaction sent:", tx.hash);
-            await tx.wait(); // Wait for transaction to be mined
-            alert("Your Strato Smart Wallet created successfully!");
-            await init(); // Re-initialize the dashboard to update state
-        } catch (error) {
-            console.error("Error creating Strato Wallet:", error);
-            alert("Failed to create Strato Wallet. See console for details.");
-            createBtn.textContent = "Create Your Strato Wallet";
-        } finally {
-            createBtn.disabled = false;
-        }
-    };
-
-    const handleActivateStrategy = async (event) => { /* ... Function code ... */ };
+    const createProxyWallet = async () => { /* ... same as before ... */ };
+    const handleActivateStrategy = async (event) => { /* ... same as before ... */ };
 
     async function init() {
-        // ... (The rest of the init function remains the same) ...
+        if (typeof window.ethereum === 'undefined') { return alert("MetaMask is not installed."); }
+        try {
+            provider = new ethers.providers.Web3Provider(window.ethereum);
+            const network = await provider.getNetwork();
+            if (network.chainId !== BASE_SEPOLIA_CHAIN_ID) {
+                return document.body.innerHTML = `<h1 style="color:white; text-align:center;">Please switch to Base Sepolia and refresh.</h1>`;
+            }
+            signer = provider.getSigner();
+            userAddress = await signer.getAddress();
+            if (!factoryAddress || factoryAddress === "0xc342129C33b1090091B21c022e59b071937D51Ae") throw new Error("Factory address is not set.");
+            
+            factoryContract = new ethers.Contract(factoryAddress, factoryABI, signer);
+            userProxyAddress = await factoryContract.wallets(userAddress);
+
+            await fetchStrategies();
+            
+            closeModalBtn.addEventListener('click', () => modal.classList.add('hidden'));
+            modal.addEventListener('click', (event) => { if (event.target === modal) modal.classList.add('hidden'); });
+            activateStrategyBtn.addEventListener('click', handleActivateStrategy);
+        } catch (error) {
+            console.error("Critical initialization error:", error);
+            document.body.innerHTML = `<h1 style="color:red; text-align:center;">Error: ${error.message}</h1>`;
+        }
     }
     
-    // --- Event Listeners ---
-    // ... (Event listeners remain the same) ...
-
     init();
 });
