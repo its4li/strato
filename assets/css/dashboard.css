@@ -202,3 +202,74 @@ body {
     font-size: 2rem;
     cursor: pointer;
 }
+/* --- Strategy Card Styles --- */
+.strategy-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+    gap: 1.5rem;
+    margin-top: 2rem;
+}
+
+.strategy-card {
+    padding: 1.5rem;
+    text-align: left;
+}
+
+.strategy-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    padding-bottom: 1rem;
+}
+
+.strategy-type {
+    font-weight: 700;
+    font-size: 1.1rem;
+}
+
+.status {
+    font-size: 0.8rem;
+    font-weight: 700;
+    padding: 0.25rem 0.75rem;
+    border-radius: 20px;
+    background-color: #A0A0B4;
+    color: #0A0E2E;
+}
+
+.status.active {
+    background-color: #31C48D; /* Green color for active status */
+}
+
+.strategy-card-body {
+    font-size: 1rem;
+    color: #A0A0B4;
+    margin-bottom: 1.5rem;
+}
+
+.strategy-card-footer {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.card-button {
+    flex-grow: 1;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: #FFFFFF;
+    padding: 0.75rem;
+    border-radius: 12px;
+    cursor: pointer;
+    font-family: 'Satoshi', sans-serif;
+    font-weight: 500;
+    transition: background-color 0.2s ease;
+}
+
+.card-button.pause {
+    color: #FF9F9F;
+}
+
+.card-button:hover {
+    background: rgba(255, 255, 255, 0.1);
+}
