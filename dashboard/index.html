@@ -9,6 +9,65 @@
     <script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.umd.min.js" type="application/javascript"></script>
 </head>
 <body>
+
+    <div class="dashboard-container">
+        
+        <header class="dashboard-header">
+            <a href="../index.html">
+                <img src="../assets/images/logo.png" alt="Strato Logo" class="logo">
+            </a>
+        </header>
+
+        <main class="dashboard-main">
+
+            <div class="card value-card">
+                <span class="card-title">Total Value</span>
+                <span class="card-amount">$0.00</span>
+            </div>
+
+            <div class="strategies-section">
+                <h2 class="section-title">Active Strategies</h2>
+                <div class="empty-state">
+                    <p>Your automated strategies will appear here.</p>
+                    <button class="cta-button" id="open-modal-btn">+ Create New Strategy</button>
+                </div>
+                </div>
+
+        </main>
+
+    </div>
+
+    <div class="modal-overlay hidden" id="strategy-modal">
+        <div class="modal-content">
+            <h2 class="modal-title">Create a Smart DCA Strategy</h2>
+            <div class="form-group">
+                <label for="spend-amount">Spend</label>
+                <div class="input-group">
+                    <input type="number" id="spend-amount" value="100">
+                    <div class="token-selector"><span>USDC</span></div>
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="frequency">Frequency</label>
+                <div class="select-group">
+                    <select id="frequency"><option selected>Every Week</option></select>
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="buy-token">To Buy</label>
+                <div class="select-group">
+                     <select id="buy-token"><option selected>WETH</option></select>
+                </div>
+            </div>
+            <div class="summary-box">
+                <p>You will spend 100 USDC every week to buy WETH.</p>
+            </div>
+            <button class="cta-button modal-action-btn">Activate Strategy</button>
+            <button class="close-modal-btn" id="close-modal-btn">&times;</button>
+        </div>
+    </div>
+
     <script src="../assets/js/dashboard.js"></script>
+
 </body>
 </html>
