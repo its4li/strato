@@ -26,25 +26,21 @@ body {
 
 /* --- The Magic: Creating Ethereal Glows with CSS --- */
 
-/* Farthest layer: A large, soft blue glow */
 .layer-1 {
     background-image: radial-gradient(circle at 20% 30%, rgba(0, 82, 255, 0.15), transparent 40%);
     z-index: 1;
 }
 
-/* A magenta glow on the other side */
 .layer-2 {
     background-image: radial-gradient(circle at 80% 70%, rgba(255, 0, 229, 0.1), transparent 35%);
     z-index: 2;
 }
 
-/* A smaller, more focused blue glow */
 .layer-3 {
     background-image: radial-gradient(circle at 75% 25%, rgba(0, 82, 255, 0.2), transparent 30%);
     z-index: 3;
 }
 
-/* This layer could be for abstract lines or particles in the future */
 .layer-4 {
     z-index: 4;
 }
@@ -53,9 +49,9 @@ body {
 /* --- Foreground Content --- */
 
 .content {
-    position: relative; /* Changed from absolute to relative to stack properly */
+    position: relative;
     text-align: center;
-    z-index: 5; /* Ensures content is always on top */
+    z-index: 5;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -63,7 +59,7 @@ body {
 }
 
 .logo {
-    width: 70px;
+    width: 90px; /* UPDATED SIZE */
     margin-bottom: 24px;
 }
 
@@ -73,7 +69,7 @@ h1 {
     margin: 0;
     max-width: 750px;
     line-height: 1.2;
-    text-shadow: 0 0 20px rgba(0, 0, 0, 0.5); /* Adds readability */
+    text-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
 }
 
 .cta-button {
@@ -95,12 +91,12 @@ h1 {
     box-shadow: 0 12px 24px rgba(0, 82, 255, 0.25);
 }
 
-/* --- New Style for the Dashboard link/button --- */
+/* --- Style for the Dashboard link/button --- */
 .dashboard-link {
     position: absolute;
     top: 2rem;
     right: 2.5rem;
-    z-index: 20; /* Ensures it's above all layers */
+    z-index: 20;
     
     font-size: 1rem;
     font-weight: 500;
@@ -116,5 +112,5 @@ h1 {
 
 .dashboard-link:hover {
     background-color: #FFFFFF;
-    color: #0A0E2E; /* Dark background color */
+    color: #0A0E2E;
 }
