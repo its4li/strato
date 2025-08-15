@@ -1,0 +1,95 @@
+/* Importing the Satoshi Font */
+@import url('https://api.fontshare.com/v2/css?f[]=satoshi@700,500,400&display=swap');
+
+body {
+    margin: 0;
+    font-family: 'Satoshi', sans-serif;
+    background-color: #0A0E2E; /* Dark Blue/Purple Background */
+    color: #FFFFFF;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start; /* Align to the top */
+    min-height: 100vh;
+    padding-top: 4rem;
+}
+
+.dashboard-container {
+    width: 100%;
+    max-width: 900px;
+    padding: 0 2rem;
+}
+
+.dashboard-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 3rem;
+}
+
+.logo {
+    width: 60px;
+}
+
+.dashboard-main {
+    width: 100%;
+}
+
+.card {
+    background: rgba(20, 19, 45, 0.7); /* Semi-transparent surface color */
+    border-radius: 20px;
+    padding: 2rem;
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.value-card {
+    text-align: center;
+    margin-bottom: 3rem;
+}
+
+.card-title {
+    display: block;
+    font-size: 1.1rem;
+    color: #A0A0B4; /* Lighter text for titles */
+    margin-bottom: 0.75rem;
+}
+
+.card-amount {
+    display: block;
+    font-size: 3.5rem;
+    font-weight: 700;
+}
+
+.strategies-section {
+    text-align: center;
+}
+
+.section-title {
+    font-size: 1.5rem;
+    font-weight: 500;
+    margin-bottom: 2rem;
+}
+
+.empty-state p {
+    font-size: 1rem;
+    color: #A0A0B4;
+    margin-bottom: 1.5rem;
+}
+
+.cta-button {
+    padding: 1rem 2.5rem;
+    font-size: 1.1rem;
+    font-weight: 500;
+    font-family: 'Satoshi', sans-serif;
+    color: #FFFFFF;
+    background-color: #0052FF; /* Base Network Blue */
+    border: none;
+    border-radius: 50px;
+    cursor: pointer;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.cta-button:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 10px 20px rgba(0, 82, 255, 0.2);
+}
