@@ -1,58 +1,64 @@
 document.addEventListener('DOMContentLoaded', () => {
-    // --- Element Selections ---
     const hamburgerBtn = document.getElementById('hamburger-menu');
     const portfolioList = document.getElementById('portfolio-list');
 
     let provider, userAddress;
 
-    // --- Hamburger Menu Logic ---
     hamburgerBtn.addEventListener('click', () => {
         document.body.classList.toggle('sidebar-open');
     });
 
-    // --- NEW: Function to Fetch and Display REAL Portfolio ---
     const fetchPortfolio = async () => {
         if (!userAddress) return;
-
-        console.log(`Fetching portfolio for ${userAddress}...`);
         portfolioList.innerHTML = `<div class="loading-state"><p>Loading your tokens...</p></div>`;
 
         try {
-            // Step 1: Fetch token balances from our own API
+            // Step 1: Fetch token balances from our Alchemy API
             const balanceRes = await fetch(`/api/portfolio/balances?address=${userAddress}`);
+            if (!balanceRes.ok) throw new Error('Failed to fetch balances');
             const balanceData = await balanceRes.json();
-            
-            const tokenContracts = balanceData.tokenBalances
-                .map(token => token.contractAddress)
-                .join(',');
+
+            // Filter out tokens with zero balance and get contract addresses
+            const tokensWithBalance = balanceData.tokenBalances.filter(token => 
+                token.tokenBalance !== "0x0000000000000000000000000000000000000000000000000000000000000000"
+            );
+            const tokenContracts = tokensWithBalance.map(token => token.contractAddress).join(',');
 
             if (!tokenContracts) {
-                 portfolioList.innerHTML = `<div class="loading-state"><p>No tokens found.</p></div>`;
+                portfolioList.innerHTML = `<div class="loading-state"><p>No tokens with a balance found.</p></div>`;
+                return;
+            }
+
+            // Step 2: Fetch prices for those tokens from our CoinGecko API
+            const priceRes = await fetch(`/api/portfolio/prices?addresses=${tokenContracts}`);
+            if (!priceRes.ok) throw new Error('Failed to fetch prices');
+            const priceData = await priceRes.json();
+
+            // Step 3: Combine and display the data
+            const portfolio = tokensWithBalance.map(token => {
+                const priceInfo = priceData[token.contractAddress.toLowerCase()];
+                const price = priceInfo ? priceInfo.usd : 0;
+                
+                // We need token metadata (symbol, decimals) for accurate formatting
+                // For this demo, we'll make some assumptions
+                const balance = parseFloat(ethers.utils.formatUnits(token.tokenBalance, 18)).toFixed(4);
+                const value = (parseFloat(balance) * price).toFixed(2);
+
+                return {
+                    symbol: 'TOKEN', // Replace with actual symbol later
+                    address: token.contractAddress,
+                    balance: balance,
+                    value: value,
+                    icon: `https://via.placeholder.com/32`
+                };
+            }).filter(token => token.value > 1.00); // Filter out dust balances
+
+             portfolioList.innerHTML = ''; // Clear loading state
+            if (portfolio.length === 0) {
+                 portfolioList.innerHTML = `<div class="loading-state"><p>No valuable tokens found.</p></div>`;
                  return;
             }
 
-            // Step 2: Fetch prices for those tokens from our own API
-            const priceRes = await fetch(`/api/portfolio/prices?addresses=${tokenContracts}`);
-            const priceData = await priceRes.json();
-
-            // Step 3: Combine balance and price data
-            const portfolio = balanceData.tokenBalances.map(token => {
-                const balance = ethers.utils.formatUnits(token.tokenBalance, 18); // Assuming 18 decimals
-                const priceInfo = priceData.data[token.contractAddress][0];
-                const price = priceInfo.quote.USD.price;
-                const value = parseFloat(balance) * price;
-
-                return {
-                    symbol: priceInfo.symbol,
-                    balance: parseFloat(balance).toFixed(4),
-                    value: value.toFixed(2),
-                    // You'd need another API to get token icons reliably
-                    icon: `https://via.placeholder.com/32` 
-                };
-            }).filter(token => token.value > 1); // Filter out dust
-
-            // Step 4: Display the portfolio
-            portfolioList.innerHTML = '';
             portfolio.forEach(token => {
                 const row = document.createElement('div');
                 row.className = 'token-row';
@@ -69,17 +75,15 @@ document.addEventListener('DOMContentLoaded', () => {
 
         } catch (error) {
             console.error("Failed to fetch portfolio:", error);
-            portfolioList.innerHTML = `<div class="loading-state"><p>Could not load portfolio.</p></div>`;
+            portfolioList.innerHTML = `<div class="loading-state"><p>Could not load portfolio. Please try again.</p></div>`;
         }
     };
 
-    // --- Initialization ---
     async function init() {
         if (typeof window.ethereum !== 'undefined') {
             try {
                 provider = new ethers.providers.Web3Provider(window.ethereum);
                 const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
-                
                 if (accounts.length > 0) {
                     userAddress = accounts[0];
                     await fetchPortfolio();
