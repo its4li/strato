@@ -1,70 +1,95 @@
 document.addEventListener('DOMContentLoaded', () => {
     // --- Element Selections ---
     const hamburgerBtn = document.getElementById('hamburger-menu');
-    const sidebar = document.getElementById('sidebar');
     const portfolioList = document.getElementById('portfolio-list');
 
-    let provider, signer, userAddress;
+    let provider, userAddress;
 
     // --- Hamburger Menu Logic ---
     hamburgerBtn.addEventListener('click', () => {
         document.body.classList.toggle('sidebar-open');
     });
 
-    // --- NEW: Function to Fetch and Display Portfolio ---
+    // --- NEW: Function to Fetch and Display REAL Portfolio ---
     const fetchPortfolio = async () => {
         if (!userAddress) return;
 
         console.log(`Fetching portfolio for ${userAddress}...`);
-        
-        // Using mock data for the demo
-        const mockTokens = [
-            { icon: 'https://assets.coingecko.com/coins/images/279/large/ethereum.png', symbol: 'ETH', balance: '1.25', value: '4120.50' },
-            { icon: 'https://assets.coingecko.com/coins/images/6319/large/usdc.png', symbol: 'USDC', balance: '1500.72', value: '1500.72' },
-            { icon: 'https://assets.coingecko.com/coins/images/9956/large/4c7a591b-1853-4208-97d8-15acc158f090.png', symbol: 'WBTC', balance: '0.05', value: '3500.00' }
-        ];
+        portfolioList.innerHTML = `<div class="loading-state"><p>Loading your tokens...</p></div>`;
 
-        portfolioList.innerHTML = ''; 
+        try {
+            // Step 1: Fetch token balances from our own API
+            const balanceRes = await fetch(`/api/portfolio/balances?address=${userAddress}`);
+            const balanceData = await balanceRes.json();
+            
+            const tokenContracts = balanceData.tokenBalances
+                .map(token => token.contractAddress)
+                .join(',');
 
-        mockTokens.forEach(token => {
-            const row = document.createElement('div');
-            row.className = 'token-row';
-            row.innerHTML = `
-                <div class="token-name-cell">
-                    <img src="${token.icon}" alt="${token.symbol}" class="token-icon">
-                    <span class="token-symbol">${token.symbol}</span>
-                </div>
-                <div class="token-balance">${token.balance}</div>
-                <div class="token-value">$${token.value}</div>
-            `;
-            portfolioList.appendChild(row);
-        });
+            if (!tokenContracts) {
+                 portfolioList.innerHTML = `<div class="loading-state"><p>No tokens found.</p></div>`;
+                 return;
+            }
+
+            // Step 2: Fetch prices for those tokens from our own API
+            const priceRes = await fetch(`/api/portfolio/prices?addresses=${tokenContracts}`);
+            const priceData = await priceRes.json();
+
+            // Step 3: Combine balance and price data
+            const portfolio = balanceData.tokenBalances.map(token => {
+                const balance = ethers.utils.formatUnits(token.tokenBalance, 18); // Assuming 18 decimals
+                const priceInfo = priceData.data[token.contractAddress][0];
+                const price = priceInfo.quote.USD.price;
+                const value = parseFloat(balance) * price;
+
+                return {
+                    symbol: priceInfo.symbol,
+                    balance: parseFloat(balance).toFixed(4),
+                    value: value.toFixed(2),
+                    // You'd need another API to get token icons reliably
+                    icon: `https://via.placeholder.com/32` 
+                };
+            }).filter(token => token.value > 1); // Filter out dust
+
+            // Step 4: Display the portfolio
+            portfolioList.innerHTML = '';
+            portfolio.forEach(token => {
+                const row = document.createElement('div');
+                row.className = 'token-row';
+                row.innerHTML = `
+                    <div class="token-name-cell">
+                        <img src="${token.icon}" alt="${token.symbol}" class="token-icon">
+                        <span class="token-symbol">${token.symbol}</span>
+                    </div>
+                    <div class="token-balance">${token.balance}</div>
+                    <div class="token-value">$${token.value}</div>
+                `;
+                portfolioList.appendChild(row);
+            });
+
+        } catch (error) {
+            console.error("Failed to fetch portfolio:", error);
+            portfolioList.innerHTML = `<div class="loading-state"><p>Could not load portfolio.</p></div>`;
+        }
     };
 
     // --- Initialization ---
     async function init() {
-        if (typeof window.ethereum === 'undefined') {
-            console.log("MetaMask is not installed. Redirecting...");
-            window.location.href = '/';
-            return;
-        }
-
-        try {
-            provider = new ethers.providers.Web3Provider(window.ethereum);
-            
-            // Request account access if not already connected
-            const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
-            
-            if (accounts.length > 0) {
-                userAddress = accounts[0];
-                console.log("User connected:", userAddress);
-                await fetchPortfolio(); // Fetch the portfolio on load
-            } else {
-                console.log("No accounts found. Redirecting...");
-                window.location.href = '/'; 
+        if (typeof window.ethereum !== 'undefined') {
+            try {
+                provider = new ethers.providers.Web3Provider(window.ethereum);
+                const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+                
+                if (accounts.length > 0) {
+                    userAddress = accounts[0];
+                    await fetchPortfolio();
+                } else {
+                    window.location.href = '/'; 
+                }
+            } catch (error) {
+                window.location.href = '/';
             }
-        } catch (error) {
-            console.error("Initialization error:", error);
+        } else {
             window.location.href = '/';
         }
     }
