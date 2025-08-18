@@ -23,8 +23,13 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     try {
         const alchemyRes = await fetch(url, options);
         const data = await alchemyRes.json();
+        
+        // --- NEW DEBUGGING LOG ---
+        console.log("Response from Alchemy:", JSON.stringify(data, null, 2));
+
         res.status(200).json(data.result);
     } catch (error) {
+        console.error("Error in balances API:", error);
         res.status(500).json({ error: 'Failed to fetch token balances.' });
     }
 }
