@@ -1,25 +1,28 @@
 import { VercelRequest, VercelResponse } from '@vercel/node';
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
+    // Expecting a comma-separated list of contract addresses
     const { addresses } = req.query;
-    const apiKey = process.env.COINMARKETCAP_API_KEY;
 
-    if (!addresses) {
+    if (!addresses || typeof addresses !== 'string') {
         return res.status(400).json({ error: 'Token addresses are required.' });
     }
 
-    const url = `https://pro-api.coinmarketcap.com/v2/cryptocurrency/quotes/latest?address=${addresses}`;
+    // CoinGecko API for Base Mainnet
+    const url = `https://api.coingecko.com/api/v3/simple/token_price/base?contract_addresses=${addresses}&vs_currencies=usd`;
+    
     const options = {
         method: 'GET',
-        headers: { 'X-CMC_PRO_API_KEY': apiKey, 'Accept': 'application/json' }
+        headers: {
+            'Accept': 'application/json'
+        }
     };
 
     try {
-        const cmcRes = await fetch(url, options);
-        const data = await cmcRes.json();
+        const coingeckoRes = await fetch(url, options);
+        const data = await coingeckoRes.json();
         
-        // --- NEW DEBUGGING LOG ---
-        console.log("Response from CoinMarketCap:", JSON.stringify(data, null, 2));
+        console.log("Response from CoinGecko:", JSON.stringify(data, null, 2));
 
         res.status(200).json(data);
     } catch (error) {
